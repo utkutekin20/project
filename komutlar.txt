@@ -1,0 +1,5 @@
+npx electron-rebuild -f -w better-sqlite3
+
+npm run electron-dev
+
+npm run electron-build
