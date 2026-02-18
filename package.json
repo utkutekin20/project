@@ -1,6 +1,6 @@
 {
   "name": "ucler-yangin-takip",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Üçler Yangın - Yangın Tüpü Takip Programı",
   "main": "public/electron.js",
   "homepage": "./",

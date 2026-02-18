@@ -64,7 +64,8 @@ const TubesLayer = () => {
         tup_cinsi: '',
         kilo: '6',
         adet: '1',
-        location_description: ''
+        location_description: '',
+        seri_no: ''
     });
 
     // Tüp cinsleri - varsayılan liste + veritabanından gelen özel cinsler
@@ -185,7 +186,8 @@ const TubesLayer = () => {
             dolum_tarihi: formData.dolum_tarihi,
             son_kullanim_tarihi: formData.son_kullanim_tarihi,
             adet: parseInt(formData.adet) || 1,
-            location_description: formData.location_description || ''
+            location_description: formData.location_description || '',
+            seri_no: formData.seri_no.trim() || ''
         };
 
         setCart(prev => [...prev, newItem]);
@@ -199,7 +201,8 @@ const TubesLayer = () => {
             tup_cinsi: '',
             kilo: '6',
             adet: '1',
-            location_description: ''
+            location_description: '',
+            seri_no: ''
         }));
     };
 
@@ -229,34 +232,47 @@ const TubesLayer = () => {
 
         let savedCount = 0;
         const savedSerials = [];
+        const errors = [];
 
         try {
             for (const item of cart) {
                 for (let i = 0; i < item.adet; i++) {
-                    // Veritabanına kaydet
-                    if (window.api) {
-                        const tubeData = {
-                            customer_id: item.customer_id,
-                            tup_cinsi: item.tup_cinsi,
-                            kilo: item.kilo,
-                            dolum_tarihi: item.dolum_tarihi,
-                            son_kullanim_tarihi: item.son_kullanim_tarihi,
-                            location_description: item.location_description || null
-                        };
-
-                        const result = await window.api.tube.add(tubeData);
-                        if (result.success) {
-                            savedSerials.push({
-                                seri_no: result.seri_no,
-                                tup_cinsi: item.tup_cinsi,
-                                kilo: item.kilo,
-                                customer_name: item.customer_name
-                            });
-                            savedCount++;
-                        }
+                    if (!window.api) {
+                        setIsSaving(false);
+                        alert('API bağlantısı yok! Uygulamayı Electron modunda çalıştırın.');
+                        return;
                     }
 
-                    setSaveProgress(Math.round((savedCount / totalTubes) * 100));
+                    const tubeData = {
+                        customer_id: item.customer_id,
+                        tup_cinsi: item.tup_cinsi,
+                        kilo: item.kilo,
+                        dolum_tarihi: item.dolum_tarihi,
+                        son_kullanim_tarihi: item.son_kullanim_tarihi,
+                        location_description: item.location_description || null,
+                        seri_no: item.seri_no || null
+                    };
+
+                    const result = await window.api.tube.add(tubeData);
+                    if (result.success) {
+                        savedSerials.push({
+                            seri_no: result.seri_no,
+                            tup_cinsi: item.tup_cinsi,
+                            kilo: item.kilo,
+                            customer_name: item.customer_name,
+                            dolum_tarihi: item.dolum_tarihi,
+                            son_kullanim_tarihi: item.son_kullanim_tarihi
+                        });
+                        savedCount++;
+                    } else {
+                        errors.push(result.error);
+                        // Duplicate seri no hatası - kaydetmeyi durdur ve kullanıcıya göster
+                        setIsSaving(false);
+                        alert(`⚠️ KAYIT BAŞARISIZ!\n\n${result.error}\n\nLütfen seri numarasını değiştirin veya boş bırakarak otomatik numara verilmesini sağlayın.`);
+                        return;
+                    }
+
+                    setSaveProgress(Math.round(((savedCount + errors.length) / totalTubes) * 100));
                 }
             }
 
@@ -283,7 +299,7 @@ const TubesLayer = () => {
         } catch (error) {
             console.error('Kayıt hatası:', error);
             setIsSaving(false);
-            displayToast('Kayıt sırasında hata oluştu', 'danger');
+            alert(`❌ Kayıt sırasında hata oluştu!\n\n${error.message}`);
         }
     };
 
@@ -310,56 +326,31 @@ const TubesLayer = () => {
             labelsHtml += `
                 <div class="etiket" style="${index > 0 ? 'page-break-before: always;' : ''}">
                     <!-- Üst Şerit - Firma Adı -->
-                    <div class="top-banner">
-                        <span class="banner-text">★ ${sirketAdi.toUpperCase()} ★</span>
-                    </div>
+                    <div class="top-banner">★ ${sirketAdi.toUpperCase()} ★</div>
                     
-                    <!-- Ana İçerik Alanı -->
-                    <div class="main-content">
-                        <!-- Sol: QR Kod -->
-                        <div class="qr-section">
-                            <div class="qr-frame">
-                                <img src="${qrDataUrl}" class="qr-img"/>
-                            </div>
-                        </div>
-                        
-                        <!-- Sağ: Bilgiler -->
-                        <div class="info-section">
-                            <!-- Müşteri -->
-                            <div class="customer-box">
-                                <div class="customer-name">${firmaAdi}</div>
-                            </div>
-                            
-                            <!-- Barkod No - Büyük -->
-                            <div class="serial-box">
-                                <span class="serial-no">${s.seri_no}</span>
-                            </div>
-                            
-                            <!-- Tüp Bilgisi -->
-                            <div class="tube-info">
-                                <span class="tube-type">${s.tup_cinsi}</span>
-                                <span class="tube-weight">${s.kilo} KG</span>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Seri Numarası - Tam genişlik -->
+                    <div class="serial-row">${s.seri_no}</div>
                     
-                    <!-- Alt Tarih Şeridi -->
-                    <div class="date-strip">
-                        <div class="date-item">
-                            <span class="date-lbl">DOLUM:</span>
-                            <span class="date-val">${dolumTarihi}</span>
+                    <!-- Orta Alan: QR + Bilgiler -->
+                    <div class="mid-section">
+                        <div class="qr-area">
+                            <img src="${qrDataUrl}" class="qr-img"/>
                         </div>
-                        <div class="date-divider">│</div>
-                        <div class="date-item skt">
-                            <span class="date-lbl">S.K.T:</span>
-                            <span class="date-val">${sktTarihi}</span>
+                        <div class="info-area">
+                            <div class="customer-row">${firmaAdi}</div>
+                            <div class="type-row">
+                                <span class="type-val">${s.tup_cinsi}</span>
+                                <span class="weight-val">${s.kilo} KG</span>
+                            </div>
+                            <div class="date-row">
+                                <div>DOLUM: <b>${dolumTarihi}</b></div>
+                                <div>SKT: <b>${sktTarihi}</b></div>
+                            </div>
                         </div>
                     </div>
                     
                     <!-- Alt Şerit - Telefon -->
-                    <div class="bottom-banner">
-                        <span>${sirketTel ? '✆ ' + sirketTel : ''}</span>
-                    </div>
+                    <div class="bottom-banner">${sirketTel ? '✆ ' + sirketTel : ''}</div>
                 </div>
             `;
         });
@@ -374,7 +365,7 @@ const TubesLayer = () => {
                     * { margin: 0; padding: 0; box-sizing: border-box; }
                     @page { size: 60mm 40mm; margin: 0; }
                     body { 
-                        font-family: 'Arial Black', Arial, sans-serif; 
+                        font-family: Arial, 'Arial Black', sans-serif; 
                         background: white;
                         display: flex;
                         flex-direction: column;
@@ -384,136 +375,111 @@ const TubesLayer = () => {
                     .etiket {
                         width: 60mm;
                         height: 40mm;
-                        border: 2.5px solid #000;
+                        border: 2px solid #000;
                         display: flex;
                         flex-direction: column;
                         background: #fff;
                         overflow: hidden;
                     }
                     
-                    /* Üst Banner */
+                    /* Üst Banner - Şirket */
                     .top-banner {
                         background: #000;
                         color: #fff;
                         text-align: center;
-                        padding: 1.2mm 1mm;
-                        font-size: 8pt;
+                        padding: 0.6mm 1mm;
+                        font-size: 6.5pt;
                         font-weight: 900;
-                        letter-spacing: 0.3mm;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        line-height: 1.2;
+                        flex-shrink: 0;
                     }
                     
-                    /* Ana İçerik */
-                    .main-content {
+                    /* Seri Numarası - Tam genişlik, büyük font */
+                    .serial-row {
+                        background: #fff;
+                        color: #000;
+                        text-align: center;
+                        font-size: 13pt;
+                        font-weight: 900;
+                        font-family: 'Courier New', monospace;
+                        padding: 0.8mm 2mm;
+                        border-bottom: 2px solid #000;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        flex-shrink: 0;
+                        letter-spacing: 0.5mm;
+                    }
+                    
+                    /* Orta Bölüm - QR + Bilgi */
+                    .mid-section {
                         display: flex;
                         flex: 1;
+                        min-height: 0;
                         border-bottom: 1.5px solid #000;
                     }
                     
-                    /* QR Bölümü */
-                    .qr-section {
-                        width: 18mm;
+                    /* QR */
+                    .qr-area {
+                        width: 15mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         border-right: 1.5px solid #000;
-                        padding: 1mm;
-                    }
-                    .qr-frame {
-                        width: 15mm;
-                        height: 15mm;
-                        border: 1.5px solid #000;
                         padding: 0.5mm;
+                        flex-shrink: 0;
                     }
                     .qr-img {
-                        width: 100%;
-                        height: 100%;
+                        width: 13mm;
+                        height: 13mm;
                         display: block;
                         image-rendering: pixelated;
                     }
                     
-                    /* Bilgi Bölümü */
-                    .info-section {
+                    /* Bilgi Alanı */
+                    .info-area {
                         flex: 1;
                         display: flex;
                         flex-direction: column;
-                        padding: 1mm;
+                        justify-content: center;
+                        padding: 0.5mm 1.5mm;
+                        gap: 0.5mm;
+                        min-width: 0;
                     }
                     
-                    .customer-box {
-                        border: 1px solid #000;
-                        padding: 0.8mm 1.5mm;
-                        margin-bottom: 1mm;
-                        background: #f5f5f5;
-                    }
-                    .customer-name {
+                    .customer-row {
                         font-size: 6.5pt;
                         font-weight: 900;
                         text-transform: uppercase;
                         white-space: nowrap;
                         overflow: hidden;
                         text-overflow: ellipsis;
+                        border-bottom: 1px solid #999;
+                        padding-bottom: 0.5mm;
                     }
                     
-                    .serial-box {
-                        background: #000;
-                        color: #fff;
-                        text-align: center;
-                        padding: 1mm;
-                        margin-bottom: 1mm;
-                    }
-                    .serial-no {
-                        font-size: 11pt;
-                        font-weight: 900;
-                        font-family: 'Courier New', monospace;
-                        letter-spacing: 0.5mm;
-                    }
-                    
-                    .tube-info {
+                    .type-row {
                         display: flex;
                         justify-content: space-between;
-                        border: 1.5px solid #000;
-                        font-size: 7pt;
+                        font-size: 8pt;
                         font-weight: 900;
                     }
-                    .tube-type {
-                        flex: 1;
-                        padding: 0.8mm 1.5mm;
-                        border-right: 1px solid #000;
+                    .type-val {
                         text-transform: uppercase;
                     }
-                    .tube-weight {
-                        padding: 0.8mm 1.5mm;
-                        text-align: center;
-                        min-width: 12mm;
-                    }
                     
-                    /* Tarih Şeridi */
-                    .date-strip {
+                    .date-row {
                         display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 1mm 2mm;
-                        border-bottom: 1.5px solid #000;
-                        font-size: 7pt;
-                        font-weight: 900;
+                        justify-content: space-between;
+                        font-size: 5.5pt;
+                        font-weight: 700;
+                        color: #333;
                     }
-                    .date-item {
-                        display: flex;
-                        gap: 1mm;
-                    }
-                    .date-lbl {
-                        font-weight: 900;
-                    }
-                    .date-val {
+                    .date-row b {
                         font-family: 'Courier New', monospace;
-                    }
-                    .date-item.skt .date-val {
-                        text-decoration: underline;
-                        text-decoration-thickness: 1.5px;
-                    }
-                    .date-divider {
-                        margin: 0 2mm;
-                        font-weight: 900;
                     }
                     
                     /* Alt Banner */
@@ -521,10 +487,10 @@ const TubesLayer = () => {
                         background: #000;
                         color: #fff;
                         text-align: center;
-                        padding: 0.8mm;
-                        font-size: 7pt;
+                        padding: 0.4mm;
+                        font-size: 6pt;
                         font-weight: 900;
-                        letter-spacing: 0.2mm;
+                        flex-shrink: 0;
                     }
                     
                     @media print {
@@ -538,7 +504,7 @@ const TubesLayer = () => {
                             -webkit-print-color-adjust: exact !important;
                             print-color-adjust: exact !important;
                         }
-                        .top-banner, .bottom-banner, .serial-box {
+                        .top-banner, .bottom-banner {
                             background: #000 !important;
                             color: #fff !important;
                             -webkit-print-color-adjust: exact !important;
@@ -749,7 +715,28 @@ const TubesLayer = () => {
                                     </div>
                                 </div>
 
-                                {/* Bulunduğu Yer */}
+                                {/* Seri Numarası (Manuel) */}
+                                <div className="col-12">
+                                    <div className="mb-20">
+                                        <label
+                                            htmlFor="seri_no"
+                                            className="form-label fw-semibold text-primary-light text-sm mb-8"
+                                        >
+                                            Seri Numarası <span className="text-secondary-light">(Opsiyonel - boş bırakılırsa otomatik üretilir)</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            name="seri_no"
+                                            id="seri_no"
+                                            className="form-control radius-8"
+                                            value={formData.seri_no}
+                                            onChange={handleInputChange}
+                                            placeholder="Örn: ABC-123, TÜp-001..."
+                                        />
+                                    </div>
+                                </div>
+
+                            {/* Bulunduğu Yer */}
                                 <div className="col-12">
                                     <div className="mb-20">
                                         <label
@@ -923,6 +910,7 @@ const TubesLayer = () => {
                                                     </div>
                                                     <span className="text-sm text-secondary-light">
                                                         {item.customer_name} • SKT: {formatDate(item.son_kullanim_tarihi)}
+                                                        {item.seri_no ? ` • SN: ${item.seri_no}` : ''}
                                                     </span>
                                                 </div>
                                             </div>

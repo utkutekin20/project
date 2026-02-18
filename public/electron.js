@@ -587,7 +587,16 @@ function getNextSerialNumber() {
         row = { counter: 0 };
     }
 
-    const nextSira = row.counter + 1;
+    // Veritabanındaki en yüksek sıra numarasını da kontrol et
+    const maxExisting = db.prepare(`
+        SELECT MAX(CAST(SUBSTR(seri_no, INSTR(seri_no, '-') + 1) AS INTEGER)) as max_sira 
+        FROM tubes 
+        WHERE seri_no LIKE ? AND seri_no GLOB ?
+    `).get(`${currentYear}-%`, `${currentYear}-[0-9]*`);
+
+    // Sayaç ve mevcut en yüksek numaradan büyük olanı al
+    const effectiveCounter = Math.max(row.counter, maxExisting?.max_sira || 0);
+    const nextSira = effectiveCounter + 1;
 
     // Sayacı güncelle
     db.prepare('UPDATE counters SET counter = ? WHERE counter_type = ? AND year = ?').run(nextSira, 'tube', currentYear);
@@ -1067,7 +1076,24 @@ ipcMain.handle('customer:getDetails', async (event, id) => {
 // Tüp işlemleri
 ipcMain.handle('tube:add', async (event, tube) => {
     try {
-        const { seriNo, yil, siraNo } = getNextSerialNumber();
+        let seriNo, yil, siraNo;
+
+        if (tube.seri_no && tube.seri_no.trim()) {
+            // Manuel seri numarası girilmiş - önce var mı kontrol et
+            seriNo = tube.seri_no.trim();
+            const existing = db.prepare('SELECT id, seri_no FROM tubes WHERE seri_no = ?').get(seriNo);
+            if (existing) {
+                return { success: false, error: `Bu seri numarasına (${seriNo}) ait bir tüp zaten kayıtlı!` };
+            }
+            yil = new Date().getFullYear();
+            siraNo = 0;
+        } else {
+            // Otomatik seri numarası üret
+            const serial = getNextSerialNumber();
+            seriNo = serial.seriNo;
+            yil = serial.yil;
+            siraNo = serial.siraNo;
+        }
 
         const result = db.prepare(`
             INSERT INTO tubes (customer_id, tup_cinsi, kilo, seri_no, yil, sira_no, dolum_tarihi, son_kullanim_tarihi, qr_path, location_description)
