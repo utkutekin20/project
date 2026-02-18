@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const os = require('os');
+const { autoUpdater } = require('electron-updater');
 
 // Veritabanı modülünü yükle
 let db;
@@ -814,6 +815,11 @@ app.whenReady().then(async () => {
 
     createWindow();
 
+    // Otomatik güncelleme kontrolü (sadece production'da)
+    if (!isDev) {
+        setupAutoUpdater();
+    }
+
     app.on('activate', () => {
         if (BrowserWindow.getAllWindows().length === 0) {
             createWindow();
@@ -825,6 +831,87 @@ app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
     }
+});
+
+// ==================== OTOMATİK GÜNCELLEME ====================
+function setupAutoUpdater() {
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = true;
+
+    // Güncelleme kontrol et
+    autoUpdater.checkForUpdates().catch(err => {
+        console.log('Güncelleme kontrolü başarısız:', err.message);
+    });
+
+    // Her 4 saatte bir kontrol et
+    setInterval(() => {
+        autoUpdater.checkForUpdates().catch(err => {
+            console.log('Güncelleme kontrolü başarısız:', err.message);
+        });
+    }, 4 * 60 * 60 * 1000);
+
+    autoUpdater.on('update-available', (info) => {
+        const mainWin = BrowserWindow.getAllWindows()[0];
+        if (mainWin) {
+            mainWin.webContents.send('update-available', {
+                version: info.version,
+                releaseNotes: info.releaseNotes
+            });
+        }
+    });
+
+    autoUpdater.on('update-not-available', () => {
+        console.log('Uygulama güncel.');
+    });
+
+    autoUpdater.on('download-progress', (progress) => {
+        const mainWin = BrowserWindow.getAllWindows()[0];
+        if (mainWin) {
+            mainWin.webContents.send('update-download-progress', {
+                percent: Math.round(progress.percent),
+                transferred: progress.transferred,
+                total: progress.total
+            });
+        }
+    });
+
+    autoUpdater.on('update-downloaded', () => {
+        const mainWin = BrowserWindow.getAllWindows()[0];
+        if (mainWin) {
+            mainWin.webContents.send('update-downloaded');
+        }
+    });
+
+    autoUpdater.on('error', (err) => {
+        console.error('Güncelleme hatası:', err.message);
+    });
+}
+
+// Güncelleme IPC handlers
+ipcMain.handle('updater:check', async () => {
+    try {
+        const result = await autoUpdater.checkForUpdates();
+        return { success: true, updateAvailable: !!result?.updateInfo };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('updater:download', async () => {
+    try {
+        await autoUpdater.downloadUpdate();
+        return { success: true };
+    } catch (error) {
+        return { success: false, error: error.message };
+    }
+});
+
+ipcMain.handle('updater:install', () => {
+    autoUpdater.quitAndInstall(false, true);
+});
+
+ipcMain.handle('updater:getVersion', () => {
+    return app.getVersion();
 });
 
 // ==================== IPC HANDLERS ====================

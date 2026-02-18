@@ -148,5 +148,16 @@ contextBridge.exposeInMainWorld('api', {
     dataImport: {
         importCustomers: (data) => ipcRenderer.invoke('import:customers', data),
         importTubes: (data) => ipcRenderer.invoke('import:tubes', data)
+    },
+
+    // Güncelleme işlemleri
+    updater: {
+        check: () => ipcRenderer.invoke('updater:check'),
+        download: () => ipcRenderer.invoke('updater:download'),
+        install: () => ipcRenderer.invoke('updater:install'),
+        getVersion: () => ipcRenderer.invoke('updater:getVersion'),
+        onUpdateAvailable: (callback) => ipcRenderer.on('update-available', (_, data) => callback(data)),
+        onDownloadProgress: (callback) => ipcRenderer.on('update-download-progress', (_, data) => callback(data)),
+        onUpdateDownloaded: (callback) => ipcRenderer.on('update-downloaded', () => callback())
     }
 });

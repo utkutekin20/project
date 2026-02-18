@@ -107,6 +107,13 @@
     "productName": "Üçler Yangın Takip",
     "copyright": "Copyright © 2026 Üçler Yangın",
     "icon": "build/icon.ico",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "utkutekin20",
+        "repo": "project"
+      }
+    ],
     "directories": {
       "output": "dist"
     },
