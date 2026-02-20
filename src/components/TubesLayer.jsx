@@ -392,7 +392,6 @@ const TubesLayer = () => {
                         font-weight: 900;
                         white-space: nowrap;
                         overflow: hidden;
-                        text-overflow: ellipsis;
                         line-height: 1.2;
                         flex-shrink: 0;
                     }
@@ -409,9 +408,7 @@ const TubesLayer = () => {
                         border-bottom: 2px solid #000;
                         white-space: nowrap;
                         overflow: hidden;
-                        text-overflow: ellipsis;
                         flex-shrink: 0;
-                        letter-spacing: 0.5mm;
                     }
                     
                     /* Orta Bölüm - QR + Bilgi */
@@ -456,7 +453,6 @@ const TubesLayer = () => {
                         text-transform: uppercase;
                         white-space: nowrap;
                         overflow: hidden;
-                        text-overflow: ellipsis;
                         border-bottom: 1px solid #999;
                         padding-bottom: 0.5mm;
                     }
@@ -516,7 +512,27 @@ const TubesLayer = () => {
             <body>
                 ${labelsHtml}
                 <script>
-                    window.onload = function() { 
+                    function autoFitText(el, maxFontPt, minFontPt) {
+                        let size = maxFontPt;
+                        el.style.fontSize = size + 'pt';
+                        while (el.scrollWidth > el.clientWidth && size > minFontPt) {
+                            size -= 0.5;
+                            el.style.fontSize = size + 'pt';
+                        }
+                    }
+                    window.onload = function() {
+                        // Üst banner - şirket adı
+                        document.querySelectorAll('.top-banner').forEach(function(el) {
+                            autoFitText(el, 6.5, 4);
+                        });
+                        // Seri numarası
+                        document.querySelectorAll('.serial-row').forEach(function(el) {
+                            autoFitText(el, 13, 7);
+                        });
+                        // Müşteri adı
+                        document.querySelectorAll('.customer-row').forEach(function(el) {
+                            autoFitText(el, 6.5, 4);
+                        });
                         setTimeout(function() {
                             window.print();
                         }, 500);

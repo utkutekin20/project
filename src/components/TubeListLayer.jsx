@@ -451,239 +451,152 @@ ${firmName}${firmCity ? '\n' + firmCity : ''}`;
                     * { margin: 0; padding: 0; box-sizing: border-box; }
                     @page { size: 60mm 40mm; margin: 0; }
                     body { 
-                        font-family: 'Arial Black', Arial, sans-serif; 
+                        font-family: Arial, 'Arial Black', sans-serif; 
                         background: white;
                         display: flex;
                         justify-content: center;
                         align-items: center;
                         min-height: 100vh;
                     }
-                    
                     .etiket {
                         width: 60mm;
                         height: 40mm;
-                        border: 2.5px solid #000;
+                        border: 2px solid #000;
                         display: flex;
                         flex-direction: column;
                         background: #fff;
                         overflow: hidden;
                     }
-                    
-                    /* Üst Banner */
                     .top-banner {
                         background: #000;
                         color: #fff;
                         text-align: center;
-                        padding: 1.2mm 1mm;
-                        font-size: 8pt;
+                        padding: 0.6mm 1mm;
+                        font-size: 6.5pt;
                         font-weight: 900;
-                        letter-spacing: 0.3mm;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        line-height: 1.2;
+                        flex-shrink: 0;
                     }
-                    
-                    /* Ana İçerik */
-                    .main-content {
+                    .serial-row {
+                        background: #fff;
+                        color: #000;
+                        text-align: center;
+                        font-size: 13pt;
+                        font-weight: 900;
+                        font-family: 'Courier New', monospace;
+                        padding: 0.8mm 2mm;
+                        border-bottom: 2px solid #000;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        flex-shrink: 0;
+                    }
+                    .mid-section {
                         display: flex;
                         flex: 1;
+                        min-height: 0;
                         border-bottom: 1.5px solid #000;
                     }
-                    
-                    /* QR Bölümü */
-                    .qr-section {
-                        width: 18mm;
+                    .qr-area {
+                        width: 15mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
                         border-right: 1.5px solid #000;
-                        padding: 1mm;
-                    }
-                    .qr-frame {
-                        width: 15mm;
-                        height: 15mm;
-                        border: 1.5px solid #000;
                         padding: 0.5mm;
+                        flex-shrink: 0;
                     }
                     .qr-img {
-                        width: 100%;
-                        height: 100%;
+                        width: 13mm;
+                        height: 13mm;
                         display: block;
                         image-rendering: pixelated;
                     }
-                    
-                    /* Bilgi Bölümü */
-                    .info-section {
+                    .info-area {
                         flex: 1;
                         display: flex;
                         flex-direction: column;
-                        padding: 1mm;
+                        justify-content: center;
+                        padding: 0.5mm 1.5mm;
+                        gap: 0.5mm;
+                        min-width: 0;
                     }
-                    
-                    .customer-box {
-                        border: 1px solid #000;
-                        padding: 0.8mm 1.5mm;
-                        margin-bottom: 1mm;
-                        background: #f5f5f5;
-                    }
-                    .customer-name {
+                    .customer-row {
                         font-size: 6.5pt;
                         font-weight: 900;
                         text-transform: uppercase;
                         white-space: nowrap;
                         overflow: hidden;
-                        text-overflow: ellipsis;
+                        border-bottom: 1px solid #999;
+                        padding-bottom: 0.5mm;
                     }
-                    
-                    .serial-box {
-                        background: #000;
-                        color: #fff;
-                        text-align: center;
-                        padding: 1mm;
-                        margin-bottom: 1mm;
-                    }
-                    .serial-no {
-                        font-size: 11pt;
-                        font-weight: 900;
-                        font-family: 'Courier New', monospace;
-                        letter-spacing: 0.5mm;
-                    }
-                    
-                    .tube-info {
+                    .type-row {
                         display: flex;
                         justify-content: space-between;
-                        border: 1.5px solid #000;
-                        font-size: 7pt;
+                        font-size: 8pt;
                         font-weight: 900;
                     }
-                    .tube-type {
-                        flex: 1;
-                        padding: 0.8mm 1.5mm;
-                        border-right: 1px solid #000;
-                        text-transform: uppercase;
-                    }
-                    .tube-weight {
-                        padding: 0.8mm 1.5mm;
-                        text-align: center;
-                        min-width: 12mm;
-                    }
-                    
-                    /* Tarih Şeridi */
-                    .date-strip {
+                    .type-val { text-transform: uppercase; }
+                    .date-row {
                         display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        padding: 1mm 2mm;
-                        border-bottom: 1.5px solid #000;
-                        font-size: 7pt;
-                        font-weight: 900;
+                        justify-content: space-between;
+                        font-size: 5.5pt;
+                        font-weight: 700;
+                        color: #333;
                     }
-                    .date-item {
-                        display: flex;
-                        gap: 1mm;
-                    }
-                    .date-lbl {
-                        font-weight: 900;
-                    }
-                    .date-val {
-                        font-family: 'Courier New', monospace;
-                    }
-                    .date-item.skt .date-val {
-                        text-decoration: underline;
-                        text-decoration-thickness: 1.5px;
-                    }
-                    .date-divider {
-                        margin: 0 2mm;
-                        font-weight: 900;
-                    }
-                    
-                    /* Alt Banner */
+                    .date-row b { font-family: 'Courier New', monospace; }
                     .bottom-banner {
                         background: #000;
                         color: #fff;
                         text-align: center;
-                        padding: 0.8mm;
-                        font-size: 7pt;
+                        padding: 0.4mm;
+                        font-size: 6pt;
                         font-weight: 900;
-                        letter-spacing: 0.2mm;
+                        flex-shrink: 0;
                     }
-                    
                     @media print {
-                        html, body { 
-                            width: 60mm; 
-                            height: 40mm; 
-                            margin: 0;
-                            padding: 0;
-                        }
-                        body {
-                            min-height: auto;
-                        }
-                        .etiket {
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
-                        .top-banner, .bottom-banner, .serial-box {
-                            background: #000 !important;
-                            color: #fff !important;
-                            -webkit-print-color-adjust: exact !important;
-                            print-color-adjust: exact !important;
-                        }
+                        html, body { width: 60mm; height: 40mm; margin: 0; padding: 0; min-height: auto; }
+                        .etiket { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .top-banner, .bottom-banner { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     }
                 </style>
             </head>
             <body>
                 <div class="etiket">
-                    <!-- Üst Şerit - Firma Adı -->
-                    <div class="top-banner">
-                        <span>★ ${sirketAdi.toUpperCase()} ★</span>
-                    </div>
-                    
-                    <!-- Ana İçerik Alanı -->
-                    <div class="main-content">
-                        <!-- Sol: QR Kod -->
-                        <div class="qr-section">
-                            <div class="qr-frame">
-                                <img src="${qrDataUrl}" class="qr-img"/>
-                            </div>
+                    <div class="top-banner">★ ${sirketAdi.toUpperCase()} ★</div>
+                    <div class="serial-row">${tube.seri_no}</div>
+                    <div class="mid-section">
+                        <div class="qr-area">
+                            <img src="${qrDataUrl}" class="qr-img"/>
                         </div>
-                        
-                        <!-- Sağ: Bilgiler -->
-                        <div class="info-section">
-                            <!-- Müşteri -->
-                            <div class="customer-box">
-                                <div class="customer-name">${firmaAdi}</div>
+                        <div class="info-area">
+                            <div class="customer-row">${firmaAdi}</div>
+                            <div class="type-row">
+                                <span class="type-val">${tube.tup_cinsi}</span>
+                                <span class="weight-val">${tube.kilo} KG</span>
                             </div>
-                            
-                            <!-- Barkod No - Büyük -->
-                            <div class="serial-box">
-                                <span class="serial-no">${tube.seri_no}</span>
-                            </div>
-                            
-                            <!-- Tüp Bilgisi -->
-                            <div class="tube-info">
-                                <span class="tube-type">${tube.tup_cinsi}</span>
-                                <span class="tube-weight">${tube.kilo} KG</span>
+                            <div class="date-row">
+                                <div>DOLUM: <b>${dolumTarihi}</b></div>
+                                <div>SKT: <b>${sktTarihi}</b></div>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Alt Tarih Şeridi -->
-                    <div class="date-strip">
-                        <div class="date-item">
-                            <span class="date-lbl">DOLUM:</span>
-                            <span class="date-val">${dolumTarihi}</span>
-                        </div>
-                        <div class="date-divider">│</div>
-                        <div class="date-item skt">
-                            <span class="date-lbl">S.K.T:</span>
-                            <span class="date-val">${sktTarihi}</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Alt Şerit - Telefon -->
-                    <div class="bottom-banner">
-                        <span>${sirketTel ? '✆ ' + sirketTel : ''}</span>
-                    </div>
+                    <div class="bottom-banner">${sirketTel ? '✆ ' + sirketTel : ''}</div>
                 </div>
                 <script>
-                    window.onload = function() { 
+                    function autoFitText(el, maxFontPt, minFontPt) {
+                        let size = maxFontPt;
+                        el.style.fontSize = size + 'pt';
+                        while (el.scrollWidth > el.clientWidth && size > minFontPt) {
+                            size -= 0.5;
+                            el.style.fontSize = size + 'pt';
+                        }
+                    }
+                    window.onload = function() {
+                        document.querySelectorAll('.top-banner').forEach(function(el) { autoFitText(el, 6.5, 4); });
+                        document.querySelectorAll('.serial-row').forEach(function(el) { autoFitText(el, 13, 7); });
+                        document.querySelectorAll('.customer-row').forEach(function(el) { autoFitText(el, 6.5, 4); });
                         setTimeout(function() { window.print(); }, 500);
                     }
                 </script>
@@ -862,24 +775,36 @@ ${firmName}${firmCity ? '\n' + firmCity : ''}`;
         }
         
         const printWindow = window.open('', '_blank', 'width=800,height=600');
+        const sirketAdi = companySettings?.company_name || 'YANGIN SÖNDÜRME';
+        const sirketTel = companySettings?.phone || '';
         let labelsHtml = '';
         
         filteredTubes.forEach((tube, index) => {
             const qrDataUrl = generateQRDataUrl(tube);
+            const firmaAdi = tube.firma_adi || '-';
+            const dolumTarihi = formatDate(tube.dolum_tarihi);
+            const sktTarihi = formatDate(tube.son_kullanim_tarihi);
             labelsHtml += `
-                <div class="label" style="${index > 0 && index % 4 === 0 ? 'page-break-before: always;' : ''}">
-                    <div class="header">
-                        <div class="logo">${companySettings?.company_name || 'YANGIN SÖNDÜRME'}</div>
-                        <div class="qr-container">
-                            <img src="${qrDataUrl}" class="qr-code" alt="QR"/>
+                <div class="etiket" style="${index > 0 ? 'page-break-before: always;' : ''}">
+                    <div class="top-banner">★ ${sirketAdi.toUpperCase()} ★</div>
+                    <div class="serial-row">${tube.seri_no}</div>
+                    <div class="mid-section">
+                        <div class="qr-area">
+                            <img src="${qrDataUrl}" class="qr-img"/>
+                        </div>
+                        <div class="info-area">
+                            <div class="customer-row">${firmaAdi}</div>
+                            <div class="type-row">
+                                <span class="type-val">${tube.tup_cinsi}</span>
+                                <span class="weight-val">${tube.kilo} KG</span>
+                            </div>
+                            <div class="date-row">
+                                <div>DOLUM: <b>${dolumTarihi}</b></div>
+                                <div>SKT: <b>${sktTarihi}</b></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="seri">${tube.seri_no}</div>
-                    <div class="info">${tube.tup_cinsi} - ${tube.kilo} KG</div>
-                    <div class="dates">
-                        <div>Dolum: ${formatDate(tube.dolum_tarihi)}</div>
-                        <div>SKT: ${formatDate(tube.son_kullanim_tarihi)}</div>
-                    </div>
+                    <div class="bottom-banner">${sirketTel ? '✆ ' + sirketTel : ''}</div>
                 </div>
             `;
         });
@@ -892,90 +817,133 @@ ${firmName}${firmCity ? '\n' + firmCity : ''}`;
                 <meta charset="utf-8">
                 <style>
                     * { margin: 0; padding: 0; box-sizing: border-box; }
+                    @page { size: 60mm 40mm; margin: 0; }
                     body { 
-                        font-family: Arial, sans-serif; 
+                        font-family: Arial, 'Arial Black', sans-serif; 
                         background: white;
-                        padding: 5mm;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
                     }
-                    .label { 
-                        width: 50mm;
-                        height: 30mm;
+                    .etiket {
+                        width: 60mm;
+                        height: 40mm;
                         border: 2px solid #000;
-                        padding: 2mm;
-                        margin-bottom: 3mm;
-                        display: inline-block;
-                        vertical-align: top;
-                        margin-right: 3mm;
-                        background: white;
-                        page-break-inside: avoid;
+                        display: flex;
+                        flex-direction: column;
+                        background: #fff;
+                        overflow: hidden;
                     }
-                    .header {
+                    .top-banner {
+                        background: #000;
+                        color: #fff;
+                        text-align: center;
+                        padding: 0.6mm 1mm;
+                        font-size: 6.5pt;
+                        font-weight: 900;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        line-height: 1.2;
+                        flex-shrink: 0;
+                    }
+                    .serial-row {
+                        background: #fff;
+                        color: #000;
+                        text-align: center;
+                        font-size: 13pt;
+                        font-weight: 900;
+                        font-family: 'Courier New', monospace;
+                        padding: 0.8mm 2mm;
+                        border-bottom: 2px solid #000;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        flex-shrink: 0;
+                    }
+                    .mid-section {
+                        display: flex;
+                        flex: 1;
+                        min-height: 0;
+                        border-bottom: 1.5px solid #000;
+                    }
+                    .qr-area {
+                        width: 15mm;
                         display: flex;
                         align-items: center;
-                        justify-content: space-between;
-                        border-bottom: 2px solid #000;
-                        padding-bottom: 1mm;
-                        margin-bottom: 2mm;
+                        justify-content: center;
+                        border-right: 1.5px solid #000;
+                        padding: 0.5mm;
+                        flex-shrink: 0;
                     }
-                    .logo { 
-                        font-size: 9pt;
-                        font-weight: bold;
-                        flex: 1;
-                    }
-                    .qr-container {
-                        width: 15mm;
-                        height: 15mm;
-                        background: white;
-                    }
-                    .qr-code {
-                        width: 15mm;
-                        height: 15mm;
+                    .qr-img {
+                        width: 13mm;
+                        height: 13mm;
                         display: block;
                         image-rendering: pixelated;
-                        image-rendering: crisp-edges;
                     }
-                    .seri { 
-                        font-size: 9pt;
-                        font-weight: bold;
-                        text-align: center;
-                        margin: 1mm 0;
-                        font-family: 'Courier New', monospace;
+                    .info-area {
+                        flex: 1;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        padding: 0.5mm 1.5mm;
+                        gap: 0.5mm;
+                        min-width: 0;
                     }
-                    .info { 
+                    .customer-row {
+                        font-size: 6.5pt;
+                        font-weight: 900;
+                        text-transform: uppercase;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        border-bottom: 1px solid #999;
+                        padding-bottom: 0.5mm;
+                    }
+                    .type-row {
+                        display: flex;
+                        justify-content: space-between;
                         font-size: 8pt;
-                        text-align: center;
-                        margin: 1mm 0;
-                        font-weight: bold;
+                        font-weight: 900;
                     }
-                    .dates {
-                        font-size: 7pt;
+                    .type-val { text-transform: uppercase; }
+                    .date-row {
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: 5.5pt;
+                        font-weight: 700;
+                        color: #333;
+                    }
+                    .date-row b { font-family: 'Courier New', monospace; }
+                    .bottom-banner {
+                        background: #000;
+                        color: #fff;
                         text-align: center;
-                        margin-top: 1mm;
-                        border-top: 1px solid #000;
-                        padding-top: 1mm;
+                        padding: 0.4mm;
+                        font-size: 6pt;
+                        font-weight: 900;
+                        flex-shrink: 0;
                     }
                     @media print {
-                        body { padding: 0; margin: 0; }
-                        .label { 
-                            break-inside: avoid;
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                            color-adjust: exact;
-                        }
-                        .qr-code {
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                        }
-                        @page {
-                            margin: 0;
-                        }
+                        html, body { width: 60mm; height: 40mm; margin: 0; padding: 0; }
+                        .etiket { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .top-banner, .bottom-banner { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     }
                 </style>
             </head>
             <body>
                 ${labelsHtml}
                 <script>
-                    window.onload = function() { 
+                    function autoFitText(el, maxFontPt, minFontPt) {
+                        let size = maxFontPt;
+                        el.style.fontSize = size + 'pt';
+                        while (el.scrollWidth > el.clientWidth && size > minFontPt) {
+                            size -= 0.5;
+                            el.style.fontSize = size + 'pt';
+                        }
+                    }
+                    window.onload = function() {
+                        document.querySelectorAll('.top-banner').forEach(function(el) { autoFitText(el, 6.5, 4); });
+                        document.querySelectorAll('.serial-row').forEach(function(el) { autoFitText(el, 13, 7); });
+                        document.querySelectorAll('.customer-row').forEach(function(el) { autoFitText(el, 6.5, 4); });
                         setTimeout(function() { window.print(); }, 500);
                     }
                 </script>
@@ -1167,32 +1135,37 @@ ${firmName}${firmCity ? '\n' + firmCity : ''}`;
         }
 
         const printWindow = window.open('', '_blank', 'width=800,height=600');
+        const sirketAdi = companySettings?.company_name || 'YANGIN SÖNDÜRME';
+        const sirketTel = companySettings?.phone || '';
         
         let labelsHtml = '';
         selectedTubes.forEach((tube, index) => {
             const qrDataUrl = generateQRDataUrl(tube);
-            // Müşteri adını bul
-            const customer = customers.find(c => c.id === tube.customer_id);
-            const customerName = customer?.firma_adi || tube.firma_adi || '-';
+            const customerName = tube.firma_adi || '-';
+            const dolumTarihi = formatDate(tube.dolum_tarihi);
+            const sktTarihi = formatDate(tube.son_kullanim_tarihi);
             
             labelsHtml += `
-                <div class="label" style="${index > 0 && index % 4 === 0 ? 'page-break-before: always;' : ''}">
-                    <div class="header">
-                        <div class="company-name">★ ${companySettings?.company_name || 'YANGIN SÖNDÜRME'} ★</div>
-                    </div>
-                    <div class="content">
-                        <div class="qr-section">
-                            <img src="${qrDataUrl}" class="qr-code" alt="QR"/>
+                <div class="etiket" style="${index > 0 ? 'page-break-before: always;' : ''}">
+                    <div class="top-banner">★ ${sirketAdi.toUpperCase()} ★</div>
+                    <div class="serial-row">${tube.seri_no}</div>
+                    <div class="mid-section">
+                        <div class="qr-area">
+                            <img src="${qrDataUrl}" class="qr-img"/>
                         </div>
-                        <div class="info-section">
-                            <div class="customer-name">${customerName}</div>
-                            <div class="barcode-no">${tube.seri_no}</div>
-                            <div class="tube-info">
-                                <span class="type">${tube.tup_cinsi}</span>
-                                <span class="weight">${tube.kilo} KG</span>
+                        <div class="info-area">
+                            <div class="customer-row">${customerName}</div>
+                            <div class="type-row">
+                                <span class="type-val">${tube.tup_cinsi}</span>
+                                <span class="weight-val">${tube.kilo} KG</span>
+                            </div>
+                            <div class="date-row">
+                                <div>DOLUM: <b>${dolumTarihi}</b></div>
+                                <div>SKT: <b>${sktTarihi}</b></div>
                             </div>
                         </div>
                     </div>
+                    <div class="bottom-banner">${sirketTel ? '✆ ' + sirketTel : ''}</div>
                 </div>
             `;
         });
@@ -1205,106 +1178,133 @@ ${firmName}${firmCity ? '\n' + firmCity : ''}`;
                 <meta charset="utf-8">
                 <style>
                     * { margin: 0; padding: 0; box-sizing: border-box; }
+                    @page { size: 60mm 40mm; margin: 0; }
                     body { 
-                        font-family: Arial, sans-serif; 
+                        font-family: Arial, 'Arial Black', sans-serif; 
                         background: white;
-                        padding: 5mm;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
                     }
-                    .label { 
+                    .etiket {
                         width: 60mm;
                         height: 40mm;
-                        border: 3px solid #000;
-                        margin-bottom: 8mm;
-                        display: inline-block;
-                        vertical-align: top;
-                        margin-right: 5mm;
-                        background: white;
-                        page-break-inside: avoid;
+                        border: 2px solid #000;
+                        display: flex;
+                        flex-direction: column;
+                        background: #fff;
                         overflow: hidden;
                     }
-                    .header {
+                    .top-banner {
                         background: #000;
                         color: #fff;
-                        padding: 2mm 3mm;
                         text-align: center;
+                        padding: 0.6mm 1mm;
+                        font-size: 6.5pt;
+                        font-weight: 900;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        line-height: 1.2;
+                        flex-shrink: 0;
                     }
-                    .company-name {
-                        font-size: 8pt;
-                        font-weight: bold;
-                        text-transform: uppercase;
-                        letter-spacing: 0.5px;
+                    .serial-row {
+                        background: #fff;
+                        color: #000;
+                        text-align: center;
+                        font-size: 13pt;
+                        font-weight: 900;
+                        font-family: 'Courier New', monospace;
+                        padding: 0.8mm 2mm;
+                        border-bottom: 2px solid #000;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        flex-shrink: 0;
                     }
-                    .content {
+                    .mid-section {
                         display: flex;
-                        padding: 2mm;
-                        height: calc(100% - 10mm);
+                        flex: 1;
+                        min-height: 0;
+                        border-bottom: 1.5px solid #000;
                     }
-                    .qr-section {
-                        width: 22mm;
+                    .qr-area {
+                        width: 15mm;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        border-right: 2px solid #000;
-                        padding-right: 2mm;
+                        border-right: 1.5px solid #000;
+                        padding: 0.5mm;
+                        flex-shrink: 0;
                     }
-                    .qr-code {
-                        width: 20mm;
-                        height: 20mm;
+                    .qr-img {
+                        width: 13mm;
+                        height: 13mm;
+                        display: block;
                         image-rendering: pixelated;
-                        image-rendering: crisp-edges;
                     }
-                    .info-section {
+                    .info-area {
                         flex: 1;
-                        padding-left: 2mm;
                         display: flex;
                         flex-direction: column;
                         justify-content: center;
+                        padding: 0.5mm 1.5mm;
+                        gap: 0.5mm;
+                        min-width: 0;
                     }
-                    .customer-name {
-                        font-size: 8pt;
-                        font-weight: bold;
-                        border-bottom: 1px solid #000;
-                        padding-bottom: 1mm;
-                        margin-bottom: 1mm;
+                    .customer-row {
+                        font-size: 6.5pt;
+                        font-weight: 900;
+                        text-transform: uppercase;
+                        white-space: nowrap;
+                        overflow: hidden;
+                        border-bottom: 1px solid #999;
+                        padding-bottom: 0.5mm;
                     }
-                    .barcode-no {
-                        font-size: 14pt;
-                        font-weight: bold;
-                        font-family: 'Courier New', monospace;
-                        letter-spacing: 1px;
-                        margin: 1mm 0;
-                    }
-                    .tube-info {
+                    .type-row {
                         display: flex;
                         justify-content: space-between;
-                        font-size: 9pt;
-                        font-weight: bold;
-                        border-top: 1px solid #000;
-                        padding-top: 1mm;
-                        margin-top: 1mm;
+                        font-size: 8pt;
+                        font-weight: 900;
+                    }
+                    .type-val { text-transform: uppercase; }
+                    .date-row {
+                        display: flex;
+                        justify-content: space-between;
+                        font-size: 5.5pt;
+                        font-weight: 700;
+                        color: #333;
+                    }
+                    .date-row b { font-family: 'Courier New', monospace; }
+                    .bottom-banner {
+                        background: #000;
+                        color: #fff;
+                        text-align: center;
+                        padding: 0.4mm;
+                        font-size: 6pt;
+                        font-weight: 900;
+                        flex-shrink: 0;
                     }
                     @media print {
-                        body { padding: 0; margin: 0; }
-                        .label { 
-                            break-inside: avoid;
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                            color-adjust: exact;
-                        }
-                        .header {
-                            -webkit-print-color-adjust: exact;
-                            print-color-adjust: exact;
-                        }
-                        @page {
-                            margin: 0;
-                        }
+                        html, body { width: 60mm; height: 40mm; margin: 0; padding: 0; }
+                        .etiket { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+                        .top-banner, .bottom-banner { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
                     }
                 </style>
             </head>
             <body>
                 ${labelsHtml}
                 <script>
-                    window.onload = function() { 
+                    function autoFitText(el, maxFontPt, minFontPt) {
+                        let size = maxFontPt;
+                        el.style.fontSize = size + 'pt';
+                        while (el.scrollWidth > el.clientWidth && size > minFontPt) {
+                            size -= 0.5;
+                            el.style.fontSize = size + 'pt';
+                        }
+                    }
+                    window.onload = function() {
+                        document.querySelectorAll('.top-banner').forEach(function(el) { autoFitText(el, 6.5, 4); });
+                        document.querySelectorAll('.serial-row').forEach(function(el) { autoFitText(el, 13, 7); });
+                        document.querySelectorAll('.customer-row').forEach(function(el) { autoFitText(el, 6.5, 4); });
                         setTimeout(function() { window.print(); }, 500);
                     }
                 </script>

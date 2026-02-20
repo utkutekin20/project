@@ -248,7 +248,7 @@ const CertificatesLayer = () => {
             if (window.api) {
                 const result = await window.api.certificate.print(cert);
                 if (result.success) {
-                    displayToast(`Sertifika yazdırılıyor: ${cert.certificate_number}`, 'success');
+                    displayToast(`Sertifika açıldı. Tarayıcıdan Ctrl+P ile yazdırabilirsiniz.`, 'success');
                 } else {
                     displayToast('Yazdırma hatası: ' + result.error, 'danger');
                 }

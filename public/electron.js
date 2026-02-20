@@ -1676,7 +1676,7 @@ ipcMain.handle('certificate:delete', async (event, idOrNumber) => {
 });
 
 // Sertifika HTML template oluştur - Ortak fonksiyon
-function generateCertificateHTML(certData, companyLogo, companyName, companyPhone, companyEmail, companyAddress, tableRows, todayParts) {
+function generateCertificateHTML(certData, companyLogo, companyName, companyPhone, companyEmail, companyAddress, tableRows, todayParts, expiryParts) {
     return `
         <!DOCTYPE html>
         <html>
@@ -1999,11 +1999,11 @@ function generateCertificateHTML(certData, companyLogo, companyName, companyPhon
                 
                 <!-- Title Section with Flag Background -->
                 <div class="title-section">
-                    <div class="certificate-title">CERTIFICATE</div>
-                    <div class="certificate-subtitle">Of Inspection</div>
+                    <div class="certificate-title">SERTİFİKA</div>
+                    <div class="certificate-subtitle">Muayene ve Test Sertifikası<br><span style="font-size:10px;color:#999;">Certificate of Inspection</span></div>
                     <div class="certificate-main-title">
-                        CERTIFICATE ON EXAMINATION AND TESTING<br>
-                        OF FIRE EXTINGUISHING SYSTEMS OR THEIR COMPONENTS
+                        YANGIN SÖNDÜRME SİSTEMLERİ VEYA BİLEŞENLERİNİN MUAYENE VE TEST SERTİFİKASI<br>
+                        <span style="font-size:9px;font-weight:normal;color:#666;">Certificate on Examination and Testing of Fire Extinguishing Systems or Their Components</span>
                     </div>
                 </div>
                 
@@ -2015,8 +2015,8 @@ function generateCertificateHTML(certData, companyLogo, companyName, companyPhon
                 <!-- Certificate Number Section -->
                 <div class="cert-number-section">
                     <div class="cert-type-desc">
-                        PORTABLE EXTINGUISHERS<br>
-                        AND SPARE CHARGES
+                        TAŞINABİLİR YANGIN SÖNDÜRME CİHAZLARI VE YEDEK DOLUMLAR<br>
+                        <span style="font-size:8px;font-weight:normal;color:#666;">Portable Extinguishers and Spare Charges</span>
                     </div>
                     <div class="cert-number-box">
                         <div class="cert-number-label">SERTİFİKA NO / CERTIFICATE NO:</div>
@@ -2048,7 +2048,8 @@ function generateCertificateHTML(certData, companyLogo, companyName, companyPhon
                 
                 <!-- Table Declaration -->
                 <div class="table-declaration">
-                    WE HEREBY DECLARE AND CERTIFY THE INSPECTION AND MAINTENANCE OF FOLLOWING EQUIPMENT
+                    AŞAĞIDAKİ EKİPMANLARIN MUAYENE VE BAKIMINI BEYAN VE TASDİK EDERİZ<br>
+                    <span style="font-size:8px;font-weight:normal;color:#666;">We Hereby Declare and Certify the Inspection and Maintenance of Following Equipment</span>
                 </div>
                 
                 <!-- Main Equipment Table -->
@@ -2080,15 +2081,31 @@ function generateCertificateHTML(certData, companyLogo, companyName, companyPhon
                         </div>
                     </div>
                     <div class="date-box">
+                        <div style="background:#c0392b;color:white;padding:4px 8px;font-size:9px;font-weight:bold;text-align:center;">
+                            SERTİFİKA DÜZENLENME TARİHİ<br><span style="font-size:7px;font-weight:normal;">Certificate Issue Date</span>
+                        </div>
                         <div class="date-header">
-                            <span>DAY / GÜN</span>
-                            <span>MONTH / AY</span>
-                            <span>YEAR / YIL</span>
+                            <span>GÜN / DAY</span>
+                            <span>AY / MONTH</span>
+                            <span>YIL / YEAR</span>
                         </div>
                         <div class="date-values">
                             <span>${todayParts.day}</span>
                             <span>${todayParts.month}</span>
                             <span>${todayParts.year}</span>
+                        </div>
+                        <div style="background:#c0392b;color:white;padding:4px 8px;font-size:9px;font-weight:bold;text-align:center;border-top:2px solid #a93226;">
+                            SERTİFİKA GEÇERLİLİK TARİHİ<br><span style="font-size:7px;font-weight:normal;">Certificate Validity Date</span>
+                        </div>
+                        <div class="date-header">
+                            <span>GÜN / DAY</span>
+                            <span>AY / MONTH</span>
+                            <span>YIL / YEAR</span>
+                        </div>
+                        <div class="date-values">
+                            <span>${expiryParts ? expiryParts.day : '-'}</span>
+                            <span>${expiryParts ? expiryParts.month : '-'}</span>
+                            <span>${expiryParts ? expiryParts.year : '-'}</span>
                         </div>
                     </div>
                 </div>
@@ -2100,7 +2117,9 @@ function generateCertificateHTML(certData, companyLogo, companyName, companyPhon
 
 ipcMain.handle('certificate:print', async (event, certData) => {
     try {
-        const { BrowserWindow } = require('electron');
+        const { BrowserWindow, shell } = require('electron');
+        const fs = require('fs');
+        const os = require('os');
 
         // Firma ayarlarını al
         const settings = db.prepare('SELECT * FROM settings WHERE id = 1').get();
@@ -2129,10 +2148,23 @@ ipcMain.handle('certificate:print', async (event, certData) => {
         };
 
         const today = new Date();
-        const todayParts = getDateParts(today);
-        
         const items = certData.items || [certData];
         const validityMonths = parseInt(settings?.certificate_validity) || 12;
+
+        // Düzenlenme tarihi (issue_date veya bugün)
+        const todayParts = getDateParts(certData.issue_date || today);
+
+        // Geçerlilik tarihi hesapla
+        let expiryParts;
+        if (items.length > 0 && items[0].son_kullanim_tarihi) {
+            expiryParts = getDateParts(items[0].son_kullanim_tarihi);
+        } else if (certData.expiry_date) {
+            expiryParts = getDateParts(certData.expiry_date);
+        } else {
+            const expiryDate = new Date(certData.issue_date || today);
+            expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
+            expiryParts = getDateParts(expiryDate);
+        }
         
         // Tablo satırlarını oluştur
         const tableRows = items.map(item => {
@@ -2146,7 +2178,7 @@ ipcMain.handle('certificate:print', async (event, certData) => {
             
             return `
             <tr>
-                <td>${getTubeTypeShortCode(item.tup_cinsi) || 'CO2'}</td>
+                <td>${item.tup_cinsi || '-'}</td>
                 <td style="text-align: center;">${item.kilo || 6}</td>
                 <td style="text-align: center;">1</td>
                 <td style="text-align: center;">${formatDate(dolumTarihi)}</td>
@@ -2157,52 +2189,17 @@ ipcMain.handle('certificate:print', async (event, certData) => {
         `}).join('');
 
         // Ortak HTML fonksiyonunu kullan
-        const htmlContent = generateCertificateHTML(certData, companyLogo, companyName, companyPhone, companyEmail, companyAddress, tableRows, todayParts);
+        const htmlContent = generateCertificateHTML(certData, companyLogo, companyName, companyPhone, companyEmail, companyAddress, tableRows, todayParts, expiryParts);
 
-        // Görünür bir pencere oluştur (yazdırma için)
-        const printWindow = new BrowserWindow({
-            width: 900,
-            height: 700,
-            show: true,
-            title: 'Sertifika - ' + certData.certificate_number,
-            webPreferences: {
-                nodeIntegration: false,
-                contextIsolation: true
-            }
-        });
+        // HTML dosyasını temp klasörüne kaydet ve tarayıcıda aç
+        const tempDir = os.tmpdir();
+        const htmlPath = path.join(tempDir, `sertifika_${certData.certificate_number}_${Date.now()}.html`);
+        fs.writeFileSync(htmlPath, htmlContent, 'utf8');
+        
+        // Dosyayı varsayılan tarayıcıda aç - kullanıcı oradan Ctrl+P ile yazdırabilir
+        await shell.openPath(htmlPath);
 
-        const dataUrl = 'data:text/html;charset=utf-8,' + encodeURIComponent(htmlContent);
-        await printWindow.loadURL(dataUrl);
-
-        // Sayfa tamamen yüklendikten sonra yazdır
-        printWindow.webContents.on('did-finish-load', async () => {
-            setTimeout(async () => {
-                try {
-                    printWindow.webContents.print({
-                        silent: false,
-                        printBackground: true,
-                        pageSize: 'A4',
-                        margins: {
-                            marginType: 'custom',
-                            top: 0.5,
-                            bottom: 0.5,
-                            left: 0.5,
-                            right: 0.5
-                        }
-                    }, (success, failureReason) => {
-                        if (!success && failureReason !== 'cancelled') {
-                            console.error('Yazdırma hatası:', failureReason);
-                        }
-                        printWindow.close();
-                    });
-                } catch (err) {
-                    console.error('Yazdırma hatası:', err);
-                    printWindow.close();
-                }
-            }, 500);
-        });
-
-        return { success: true };
+        return { success: true, message: 'Sertifika açıldı. Ctrl+P ile yazdırabilirsiniz.' };
     } catch (error) {
         console.error('Sertifika yazdırma hatası:', error);
         return { success: false, error: error.message };
@@ -2241,9 +2238,23 @@ ipcMain.handle('certificate:downloadPDF', async (event, certData) => {
     };
 
     const today = new Date();
-    const todayParts = getDateParts(today);
     const items = certData.items || [certData];
     const validityMonths = parseInt(settings?.certificate_validity) || 12;
+
+    // Düzenlenme tarihi (issue_date veya bugün)
+    const todayParts = getDateParts(certData.issue_date || today);
+
+    // Geçerlilik tarihi hesapla
+    let expiryParts;
+    if (items.length > 0 && items[0].son_kullanim_tarihi) {
+        expiryParts = getDateParts(items[0].son_kullanim_tarihi);
+    } else if (certData.expiry_date) {
+        expiryParts = getDateParts(certData.expiry_date);
+    } else {
+        const expiryDate = new Date(certData.issue_date || today);
+        expiryDate.setMonth(expiryDate.getMonth() + validityMonths);
+        expiryParts = getDateParts(expiryDate);
+    }
     
     const tableRows = items.map(item => {
         const dolumTarihi = item.son_dolum_tarihi || item.issue_date || certData.issue_date || today.toISOString().split('T')[0];
@@ -2255,7 +2266,7 @@ ipcMain.handle('certificate:downloadPDF', async (event, certData) => {
         }
         return `
         <tr>
-            <td>${getTubeTypeShortCode(item.tup_cinsi) || 'CO2'}</td>
+            <td>${item.tup_cinsi || '-'}</td>
             <td style="text-align: center;">${item.kilo || 6}</td>
             <td style="text-align: center;">1</td>
             <td style="text-align: center;">${formatDate(dolumTarihi)}</td>
@@ -2265,7 +2276,7 @@ ipcMain.handle('certificate:downloadPDF', async (event, certData) => {
         </tr>
     `}).join('');
 
-    const htmlContent = generateCertificateHTML(certData, companyLogo, companyName, companyPhone, companyEmail, companyAddress, tableRows, todayParts);
+    const htmlContent = generateCertificateHTML(certData, companyLogo, companyName, companyPhone, companyEmail, companyAddress, tableRows, todayParts, expiryParts);
 
     // Masaüstü yolunu al
     const desktopPath = path.join(os.homedir(), 'Desktop');
